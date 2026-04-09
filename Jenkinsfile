@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "springboot-devops-app"
+        IMAGE_NAME = "springboot-app"
         DOCKERHUB_REPO = "tokesh070/springboot-devops-app"
     }
 
@@ -15,7 +15,7 @@ pipeline {
         stage('Clone Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/tokesh070/springboot-devops-app.git'
+                    url: 'https://github.com/tokesh070/springboot-app.git'
             }
         }
 

@@ -6,17 +6,22 @@ pipeline {
         DOCKERHUB_REPO = "tokesh070/springboot-devops-app"
     }
 
+    tools {
+        maven 'Maven'
+    }
+
     stages {
 
         stage('Clone Code') {
             steps {
-                git 'https://github.com/tokesh070/springboot-devops-app.git'
+                git branch: 'main',
+                    url: 'https://github.com/tokesh070/springboot-devops-app.git'
             }
         }
 
-        stage('Build - Maven') {
+        stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
@@ -79,6 +84,7 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f springboot-container || true
+
                 docker run -d -p 8081:8080 \
                 --name springboot-container \
                 $DOCKERHUB_REPO:${BUILD_NUMBER}

@@ -10,7 +10,7 @@ pipeline {
 
         stage('Clone Code') {
             steps {
-                git 'https://github.com/YOUR-USERNAME/springboot-devops-app.git'
+                git 'https://github.com/tokesh070/springboot-devops-app.git'
             }
         }
 
@@ -26,9 +26,10 @@ pipeline {
                 java -jar target/*.jar &
                 APP_PID=$!
 
-                sleep 10
-
-                curl -f http://localhost:8080 || exit 1
+                for i in {1..20}; do
+                    curl -s http://localhost:8080 && break
+                    sleep 2
+                done
 
                 kill $APP_PID
                 '''
@@ -59,10 +60,18 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                sh '''
-                docker tag $IMAGE_NAME:${BUILD_NUMBER} $DOCKERHUB_REPO:${BUILD_NUMBER}
-                docker push $DOCKERHUB_REPO:${BUILD_NUMBER}
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+
+                    docker tag $IMAGE_NAME:${BUILD_NUMBER} $DOCKERHUB_REPO:${BUILD_NUMBER}
+                    docker push $DOCKERHUB_REPO:${BUILD_NUMBER}
+                    '''
+                }
             }
         }
 
@@ -70,7 +79,7 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f springboot-container || true
-                docker run -d -p 8080:8080 \
+                docker run -d -p 8081:8080 \
                 --name springboot-container \
                 $DOCKERHUB_REPO:${BUILD_NUMBER}
                 '''

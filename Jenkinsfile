@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "springboot-app"
-        DOCKERHUB_REPO = "tokesh070/springboot-devops-app"
+        DOCKERHUB_REPO = "tokesh070/springboot-app"
     }
 
     tools {
@@ -15,7 +15,7 @@ pipeline {
         stage('Clone Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/tokesh070/springboot-app.git'
+                    url: 'https://github.com/toku1999/springboot-app.git'
             }
         }
 
@@ -32,7 +32,7 @@ pipeline {
                 APP_PID=$!
 
                 for i in {1..20}; do
-                    curl -s http://localhost:8080 && break
+                    curl -s http://3.80.58.205:8080 && break
                     sleep 2
                 done
 
